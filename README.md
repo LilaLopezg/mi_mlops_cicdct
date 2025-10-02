@@ -1,24 +1,24 @@
-# MLOps CI/CD - Clasificación de Iris
+# MLOps CI/CD - Clasificación de consumo de alcohol en estudiantes universitarios
 
-Este proyecto implementa un pipeline de entrenamiento y predicción para clasificar especies de flores Iris usando Machine Learning.
+Este proyecto implementa un pipeline de entrenamiento y predicción para clasificar consumo de alcohol usando Machine Learning.
 
 ## Estructura del Proyecto
 
 ```
 mlops_cicdct/
 ├── training/
-│   ├── train.py       # Script de entrenamiento
-│   ├── predict.py     # Script de predicción
+│   ├── train.py       # Script de entrenamiento un modelo RandomForest sobre el consumo de alcohol, hace evaluación, guarda modelo y métricas.
+│   ├── predict.py     # Script de predicción que toma argumentos (Ejemplo: longitudes, anchos) y hace predicción con el modelo entrenado.
 │   └── requirements.txt
 ├── predictor/
 │   ├── Dockerfile     # Dockerfile para predicción
 │   ├── predict.py     # Script de predicción (copia)
 │   ├── predict_api.py # API mejorada de predicción
 │   ├── requirements.txt
-│   ├── build_predictor.sh  # Script para construir imagen
+│   ├── build_predictor.sh  # Script para construir imagen Docker del predictor y ejecutarla.
 │   └── run_predictor.sh    # Script para ejecutar contenedor
 ├── models/            # Modelos entrenados (pickle)
-├── docker-compose.yml # Configuración Docker Compose
+├── docker-compose.yml # Configuración Docker Compose (define el servicio para levantar el predictor)
 ├── requirements.txt   # Dependencias de Python
 └── README.md         # Este archivo
 ```
