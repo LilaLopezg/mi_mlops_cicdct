@@ -22,6 +22,16 @@ mlops_cicdct/
 ├── requirements.txt   # Dependencias de Python
 └── README.md         # Este archivo
 ```
+```bash
+#Creo el entorno virtual - mlops
+python3 --version
+which python3
+brew install python
+python3.11 -m venv venv
+source venv/bin/activate # Activo el aentorno virtual
+deactivate #Desactivo el entorno virtual
+
+```
 
 ## Instalación
 
@@ -29,7 +39,6 @@ mlops_cicdct/
    ```bash
    pip install -r requirements.txt
    ```
-
 ## Uso
 
 ### 1. Entrenamiento del Modelo
@@ -38,12 +47,13 @@ Para entrenar un nuevo modelo:
 
 ```bash
 cd training
-python train.py
+python train_pre.py
 ```
 
 Este script:
-- Carga el dataset Iris de scikit-learn
+- Carga el dataset del consumo de alcohol
 - Preprocesa los datos (escalado y división train/test)
+- Aplico técnicas de balanceo
 - Entrena un modelo Random Forest
 - Evalúa el modelo y muestra métricas
 - Guarda el modelo en formato pickle en `models/`
@@ -54,7 +64,14 @@ Este script:
 
 ```bash
 cd training
-./build_and_run.sh
+#!/bin/bash
+docker run -it  --platform linux/amd64 python:3.11-slim /bin/bash #Ejecuto la imagen manualmente del contenedor de python, sobre una arquitectura de donde amd.
+
+echo "🐳 Construyendo imagen Docker para entrenamiento de Consumo de Alcohol..."
+docker build -t contenedor_entrenamiento_consumo_alcohol . # Se construye la imagen
+
+echo "🚀 Ejecutando contenedor..."
+docker run --rm consumo_alcohol_entrenamiento
 ```
 
 Este script:
@@ -84,12 +101,12 @@ python predict.py --sepal_length 5.1 --sepal_width 3.5 --petal_length 1.4 --peta
 
 **3. Predicción personalizada:**
 ```bash
-docker run --rm iris-predictor:latest python predict_api.py --sepal_length 6.0 --sepal_width 3.0 --petal_length 4.5 --petal_width 1.5
+docker run --rm consumo-predictor:latest python predict_api.py --sepal_length 6.0 --sepal_width 3.0 --petal_length 4.5 --petal_width 1.5
 ```
 
 **4. Con variables de entorno:**
 ```bash
-docker run --rm -e SEPAL_LENGTH=6.4 -e SEPAL_WIDTH=3.2 -e PETAL_LENGTH=4.5 -e PETAL_WIDTH=1.5 iris-predictor:latest python predict_api.py --env
+docker run --rm -e SEPAL_LENGTH=6.4 -e SEPAL_WIDTH=3.2 -e PETAL_LENGTH=4.5 -e PETAL_WIDTH=1.5 consumo-predictor:latest python predict_api.py --env
 ```
 
 **5. Con Docker Compose:**
