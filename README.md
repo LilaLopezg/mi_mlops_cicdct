@@ -193,7 +193,7 @@ Cerrar sesión SSH y volver a entrar
 ./predictor/run_predictor.sh
 
 # 3. Docker Compose
-docker-compose up iris-predictor
+docker-compose up iris-predictor # Cambiar a los datos consumo de alcohol
 ```
 
 #### Comandos Manuales
