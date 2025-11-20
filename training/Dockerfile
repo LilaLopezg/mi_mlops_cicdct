@@ -28,4 +28,4 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY train.py .
 
 # Comando por defecto: ejecutar el entrenamiento
-CMD ["python", "train.py"]
+CMD ["python", "train_pre.py"]
