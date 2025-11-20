@@ -17,8 +17,8 @@ from datetime import datetime
 
 
 def load_data():
-    """Carga el dataset Iris"""
-    print("Cargando dataset Iris...")
+    """Carga el dataset consumo de alcohol"""
+    print("Cargando dataset consumo de alcohol...")
     iris = load_iris()
     X = iris.data
     y = iris.target

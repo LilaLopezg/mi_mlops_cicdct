@@ -1,31 +1,20 @@
-# Usar imagen base de Python 3.13
-FROM python:3.13-slim
+# Imagen base de Python
+FROM --platform=linux/amd64 python:3.11-slim
+#FROM python:3.11-slim
 
-# Establecer variables de entorno
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
 
 # Crear directorio de trabajo
 WORKDIR /app
 
-# Crear directorio para los modelos
-RUN mkdir -p models
+# Instalar dependencias del sistema necesarias
+RUN apt-get update && apt-get install -y build-essential
 
-# Copiar archivo de requirements
+# Copiar requirements y script
 COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-# Instalar dependencias del sistema necesarias para scikit-learn
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+# Copiar todo lo demás
+COPY . .
 
-# Instalar dependencias de Python
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
-# Copiar scripts de entrenamiento
-COPY train.py .
-
-# Comando por defecto: ejecutar el entrenamiento
-CMD ["python", "train.py"]
+# Comando por defecto
+CMD ["python", "train_pre.py"]

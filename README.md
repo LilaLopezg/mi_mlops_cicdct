@@ -156,10 +156,31 @@ Cada muestra tiene 4 características:
 - **Formato**: Modelo guardado en pickle con metadatos
 
 ## 🐳 Uso con Docker
+Para el uso de docker, se realizó con una conexión por SSH
+- ssh ubuntu@XXX.XXX.XXX.X
+1. Clone el repositorio con SSH
+- git clone git@github.com:LilaLopezg/mlops_cicdct.git
+2. cd mlops_cicdct.git
+Posteriormente, instalo Docker en el servidor
+- sudo apt-get update
+- sudo apt-get install -y ca-certificates curl gnupg
+- sudo install -m 0755 -d /etc/apt/keyrings
+- curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /etc/apt/keyrings/docker.asc > /dev/null
+- sudo chmod a+r /etc/apt/keyrings/docker.asc
+- echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
+  https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+- sudo apt-get update  
+- sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+3. Permitir Docker sin sudo
+- sudo usermod -aG docker $USERexi
+Cerrar sesión SSH y volver a entrar
 
 ### Prerrequisitos
 - Docker instalado y ejecutándose
-- Modelo entrenado (`iris_model_latest.pkl` en `models/`)
+- Modelo entrenado (`consumo_model_smoteenn_latest.pkl` en `models/`)
 
 ### Predictor Docker
 

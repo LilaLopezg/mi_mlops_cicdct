@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Script para hacer predicciones usando el modelo Iris entrenado
+Script para hacer predicciones usando el modelo de consumo de alcohol entrenado.
+Ejemplo de uso:
+    python predict_consumo.py --age 20 --gender 1 --parent_alcohol 0 --academic_semester 3
 """
 
 import pickle
@@ -9,103 +11,81 @@ import os
 import argparse
 
 
-def load_model(model_path="models/iris_model_latest.pkl"):
+def load_model(model_path="models/consumo_model_smoteenn_latest.pkl"):
     """Carga el modelo entrenado desde el archivo pickle"""
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"No se encontró el modelo en: {model_path}")
     
-    with open(model_path, 'rb') as f:
+    with open(model_path, "rb") as f:
         model_data = pickle.load(f)
     
     return model_data
 
 
-def predict_iris(sepal_length, sepal_width, petal_length, petal_width, model_path="models/iris_model_latest.pkl"):
+def predict_consumo(features, model_path="models/consumo_model_smoteenn_latest.pkl"):
     """
-    Hace una predicción para una muestra de Iris
+    Realiza una predicción del nivel o riesgo de consumo de alcohol.
     
     Args:
-        sepal_length: Longitud del sépalo
-        sepal_width: Ancho del sépalo  
-        petal_length: Longitud del pétalo
-        petal_width: Ancho del pétalo
-        model_path: Ruta al modelo guardado
+        features (list[float]): Lista de valores de entrada para las variables seleccionadas.
+        model_path (str): Ruta al modelo entrenado.
     
     Returns:
-        dict: Predicción y probabilidades
+        dict: Resultado con predicción y probabilidad.
     """
-    # Cargar modelo
     model_data = load_model(model_path)
-    model = model_data['model']
-    scaler = model_data['scaler']
-    target_names = model_data['target_names']
-    
-    # Preparar datos de entrada
-    sample = np.array([[sepal_length, sepal_width, petal_length, petal_width]])
-    sample_scaled = scaler.transform(sample)
-    
-    # Hacer predicción
-    prediction = model.predict(sample_scaled)[0]
-    probabilities = model.predict_proba(sample_scaled)[0]
-    
-    # Preparar resultado
-    result = {
-        'input': {
-            'sepal_length': sepal_length,
-            'sepal_width': sepal_width,
-            'petal_length': petal_length,
-            'petal_width': petal_width
+    model = model_data["model"]
+    scaler = model_data["scaler"]
+    target_names = model_data.get("target_names", ["No consumo", "Consumo"])
+
+    # Convertir y escalar entrada
+    X = np.array([features])
+    X_scaled = scaler.transform(X)
+
+    # Predicción
+    pred = model.predict(X_scaled)[0]
+    probs = model.predict_proba(X_scaled)[0]
+
+    return {
+        "input_features": features,
+        "prediction": target_names[pred],
+        "prediction_index": int(pred),
+        "probabilities": {
+            target_names[i]: float(p) for i, p in enumerate(probs)
         },
-        'prediction': target_names[prediction],
-        'prediction_index': int(prediction),
-        'probabilities': {
-            target_names[i]: float(prob) for i, prob in enumerate(probabilities)
-        },
-        'confidence': float(max(probabilities))
+        "confidence": float(max(probs))
     }
-    
-    return result
 
 
 def main():
-    """Función principal para línea de comandos"""
-    parser = argparse.ArgumentParser(description='Predicción de especies de Iris')
-    parser.add_argument('--sepal_length', type=float, required=True, help='Longitud del sépalo')
-    parser.add_argument('--sepal_width', type=float, required=True, help='Ancho del sépalo')
-    parser.add_argument('--petal_length', type=float, required=True, help='Longitud del pétalo')
-    parser.add_argument('--petal_width', type=float, required=True, help='Ancho del pétalo')
-    parser.add_argument('--model_path', type=str, default='models/iris_model_latest.pkl', help='Ruta al modelo')
-    
+    """Ejecuta la predicción desde la línea de comandos"""
+    parser = argparse.ArgumentParser(description="Predicción de consumo de alcohol")
+    parser.add_argument("--age", type=float, required=True, help="Edad del estudiante")
+    parser.add_argument("--gender", type=int, required=True, help="Género (0=femenino, 1=masculino)")
+    parser.add_argument("--parent_alcohol", type=int, required=True, help="Padres con historial de alcoholismo (0/1)")
+    parser.add_argument("--academic_semester", type=int, required=True, help="Semestre académico actual")
+    parser.add_argument("--model_path", type=str, default="models/consumo_model_smoteenn_latest.pkl", help="Ruta al modelo")
+
     args = parser.parse_args()
-    
+
+    features = [args.age, args.gender, args.parent_alcohol, args.academic_semester]
+
     try:
-        result = predict_iris(
-            args.sepal_length,
-            args.sepal_width,
-            args.petal_length,
-            args.petal_width,
-            args.model_path
-        )
+        result = predict_consumo(features, args.model_path)
         
-        print("=" * 50)
-        print("PREDICCIÓN DE ESPECIE DE IRIS")
-        print("=" * 50)
-        print(f"Entrada:")
-        print(f"  Longitud sépalo: {result['input']['sepal_length']}")
-        print(f"  Ancho sépalo:    {result['input']['sepal_width']}")
-        print(f"  Longitud pétalo: {result['input']['petal_length']}")
-        print(f"  Ancho pétalo:    {result['input']['petal_width']}")
-        print()
+        print("=" * 60)
+        print("🔍 PREDICCIÓN DE CONSUMO DE ALCOHOL")
+        print("=" * 60)
+        print(f"Entrada: {result['input_features']}")
         print(f"Predicción: {result['prediction']}")
         print(f"Confianza: {result['confidence']:.4f}")
-        print()
-        print("Probabilidades por clase:")
-        for species, prob in result['probabilities'].items():
-            print(f"  {species}: {prob:.4f}")
-        print("=" * 50)
-        
+        print("Probabilidades:")
+        for k, v in result["probabilities"].items():
+            print(f"  {k}: {v:.4f}")
+        print("=" * 60)
+
     except Exception as e:
-        print(f"❌ Error: {str(e)}")
+        print(f"❌ Error: {e}")
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ import json
 import sys
 
 
-def load_model(model_path="models/iris_model_latest.pkl"):
+def load_model(model_path="models/consumo_model_smoteenn_latest.pkl"):
     """Carga el modelo entrenado desde el archivo pickle"""
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"No se encontró el modelo en: {model_path}")
@@ -86,7 +86,7 @@ def get_prediction_from_env():
 def run_prediction_examples():
     """Ejecuta ejemplos de predicción para cada clase"""
     print("=" * 60)
-    print("EJEMPLOS DE PREDICCIÓN - DATASET IRIS")
+    print("EJEMPLOS DE PREDICCIÓN - DATASET CONSUMO DE ALCOHOL")
     print("=" * 60)
     
     examples = [
@@ -120,7 +120,7 @@ def run_prediction_examples():
 
 def main():
     """Función principal"""
-    parser = argparse.ArgumentParser(description='Predictor de especies de Iris')
+    parser = argparse.ArgumentParser(description='Predictor deL consumo de alcohol')
     parser.add_argument('--sepal_length', type=float, help='Longitud del sépalo')
     parser.add_argument('--sepal_width', type=float, help='Ancho del sépalo')
     parser.add_argument('--petal_length', type=float, help='Longitud del pétalo')
